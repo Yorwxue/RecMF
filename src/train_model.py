@@ -1,5 +1,6 @@
 import pandas as pd
 import tensorflow as tf
+from tqdm import tqdm
 import numpy as np
 from scipy.sparse import csr_matrix, find
 
@@ -82,8 +83,14 @@ def sample_data():
     y = tf.convert_to_tensor(y, dtype=tf.float32)
 
     # One-hot the user and item index respectively
+    # Concatenate the one-hot encoding of users and items as following:
+    #      |<-- one-hot of users -->| |<- one-hot of items ->|
+    # x = [0 0 0 0 0 ... 0 1 0 ...  0 0 ... 0 1 0 ...0 0 0 0 0]
+    # which means user_i watch item_j
     x = tf.concat([tf.one_hot(sampled_u_index, num_users, dtype=tf.float32),
                    tf.one_hot(sampled_i_index, num_items, dtype=tf.float32)], axis=1)
+
+    # quantize is uesd to distinguish the different between items been watched a few times and been watched many times.
     x = tf.tile(tf.expand_dims(x, axis=1), [1, config.max_quantize, 1])
 
     return x, y
@@ -114,7 +121,7 @@ def testing():
     return binary_ce(y_true=y, y_pred=pred)
 
 
-for step in range(max_step):
+for step in tqdm(range(max_step)):
     # Model training
     training()
 
@@ -124,19 +131,11 @@ for step in range(max_step):
         # Validation
         valid_user_idx, _, _ = find(mat_valid)
         valid_user_idx = set(valid_user_idx)
-        valid_results = evaluate(mat_test, mat_train, rec_model, valid_user_idx, config.top_ks, use_prec_n_recl=True)
+        valid_results = evaluate(mat_valid, mat_train, rec_model, valid_user_idx, config.top_ks, use_prec_n_recl=True)
 
         # Testing
         test_user_idx, _, _ = find(mat_test)
         test_user_idx = set(test_user_idx) | valid_user_idx
         test_results = evaluate(mat_test + mat_valid, mat_train, rec_model, test_user_idx, config.top_ks, use_prec_n_recl=True)
 
-
-
         print("Step: %d / %d  testing loss = %f" % (step, steps_per_epoch, loss))
-
-
-
-
-
-

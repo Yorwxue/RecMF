@@ -14,7 +14,7 @@ def precision_n_recall(mat_test, mat_train, model, uid, top_ks):
     # Process predicted result
     _, item_ids, values = find(vec_train_uid)
     vec_pred_items = model.infer_user_consumption(uid)[:, 0].numpy()
-    vec_pred_items[item_ids] = -1e10
+    vec_pred_items[item_ids] = -1e10  # in order to prevent recommend items that have been watched
     vec_pred_items = list(vec_pred_items)
     topk_pred_index = list(zip(*heapq.nlargest(max(top_ks), enumerate(vec_pred_items), key=operator.itemgetter(1))))[0]
     topk_pred_index = list(topk_pred_index)

@@ -1,10 +1,12 @@
+import os
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Dataset Settings
 #
-train_path = "/home/ian/Dataset/Jester2_train.csv"
-valid_path = "/home/ian/Dataset/Jester2_valid.csv"
-test_path = "/home/ian/Dataset/Jester2_test.csv"
+train_path = os.path.abspath(os.path.join(__file__, "../..", "Dataset/Jester2_train.csv"))
+valid_path = os.path.abspath(os.path.join(__file__, "../..", "Dataset/Jester2_valid.csv"))
+test_path = os.path.abspath(os.path.join(__file__, "../..", "Dataset/Jester2_test.csv"))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
